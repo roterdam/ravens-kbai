@@ -29,7 +29,7 @@ public class MyProductionSystem {
 			solver = new project1.Project1Solver(problem, random);
 		}
 		if (problemType.equals("2x2")) {
-			solver = new project2.Project2Solver(problem, random);
+			solver = new project2.Project2Solver(problem, random, log);
 		}
 		if (solver==null) {
 			solver = new project1.RandomSolver(problem, random);

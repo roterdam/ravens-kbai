@@ -25,10 +25,15 @@
 package project1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class JohnsonTrotter {
 
+	private static HashMap<Integer,ArrayList<int[]>> knownPerms = new HashMap<Integer,ArrayList<int[]>>();
+	
 	public static ArrayList<int[]> perm(int N) {
+		/* memoization */
+		if(knownPerms.containsKey(Integer.valueOf(N))) return knownPerms.get(Integer.valueOf(N));
 		int[] p = new int[N]; // permutation
 		int[] pi = new int[N]; // inverse permutation
 		int[] dir = new int[N]; // direction = +1 or -1
@@ -39,6 +44,7 @@ public class JohnsonTrotter {
 		}
 		ArrayList<int[]> perms = new ArrayList<int[]>();
 		perm(0, p, pi, dir, perms);
+		knownPerms.put(Integer.valueOf(N), perms);
 		return perms;
 	}
 

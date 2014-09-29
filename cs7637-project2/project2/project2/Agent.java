@@ -23,6 +23,7 @@ public class Agent {
 	private double right;
 	private double problems;
 	private MyProductionSystem productionSystem;
+	private FileOutputStream dfile;
 
 	/**
 	 * The default constructor for your Agent. Make sure to execute any
@@ -36,6 +37,11 @@ public class Agent {
 		this.log = Logger.getLogger("project2");
 		/* Initialize production system, which may have saved state */
 		this.productionSystem = new MyProductionSystem(log);
+		try {
+		this.dfile=new FileOutputStream("debug.log");
+		} catch (FileNotFoundException e) {
+			log.severe("Unable to open debug.log for writing");
+		}
 		log.info("Agent initialized");
 	}
 
@@ -68,12 +74,8 @@ public class Agent {
 	public String Solve(RavensProblem problem) {
 		/* redirect debug output to file */
 		PrintStream o = System.out;
-		try {
-			PrintStream f = new PrintStream(new FileOutputStream("debug.log"));
+			PrintStream f = new PrintStream(dfile);
 			System.setOut(f);
-		} catch (FileNotFoundException e) {
-			log.severe("Unable to open debug.log for writing");
-		}
 		String response = productionSystem.solve(problem);
 		String answer = problem.checkAnswer(response);
 		boolean correct = response.equals(answer);
