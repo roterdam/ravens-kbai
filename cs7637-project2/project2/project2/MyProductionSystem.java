@@ -26,14 +26,17 @@ public class MyProductionSystem {
 		String problemType=problem.getProblemType();
 		/* logic */
 		if (problemType.equals("2x1")) {
-			solver = new project1.Project1Solver(problem, random);
+			solver = new project2.Solver2X2(problem, random, log);
 		}
 		if (problemType.equals("2x2")) {
-			solver = new project2.Project2Solver(problem, random, log);
+			solver = new project2.Solver2X2(problem, random, log);
 		}
 		if (solver==null) {
-			solver = new project1.RandomSolver(problem, random);
+			throw new RuntimeException("Why is this happening? ("+problemType+")");
+			//solver = new project1.RandomSolver(problem, random);
 		}
+		// Random override
+		//solver = new project1.RandomSolver(problem, random);
 		/* execute plan */
 		solver.solve();
 		String response = solver.getSolution();

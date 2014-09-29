@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import project1.RavensSolver;
 import project1.Utils;
 
 @SuppressWarnings("unused")
-public class Project2Solver extends RavensSolver {
+public class Solver2X2 extends RavensSolver {
 
 	private RavensProblem problem;
 	private Random random;
@@ -19,12 +20,13 @@ public class Project2Solver extends RavensSolver {
 	private HashMap<String, HashSet<String>> language;
 	private double bestDiag;
 
-	public Project2Solver(RavensProblem problem, Random random, Logger log) {
+	public Solver2X2(RavensProblem problem, Random random, Logger log) {
 		this.problem = problem;
 		this.random = random;
 		this.log = log;
 		this.solution = "1";
 		this.bestDiag=-1;
+		log.setLevel(Level.INFO);
 	}
 
 	private int findFirstBestPermutationOf(MappedFigurePair mfp){
@@ -75,7 +77,7 @@ public class Project2Solver extends RavensSolver {
 					rightChangeSet);
 			double diagonal = Math.sqrt(Math.pow(leftToRightScore, 2)+Math.pow(topToBottomScore, 2));
 
-			log.info(String.format("%s - Option: %s, LTR: %d, TTB: %d, diag: %.2f",
+			log.fine(String.format("%s - Option: %s, LTR: %d, TTB: %d, diag: %.2f",
 					problem.getName(), quad.label, leftToRightScore,
 					topToBottomScore, diagonal));
 			
@@ -116,14 +118,15 @@ public class Project2Solver extends RavensSolver {
 	public HashMap<int[], FigureQuad> generateCandidates() {
 		HashMap<int[], FigureQuad> candidates = new HashMap<int[], FigureQuad>();
 		RavensFigure question = Utils.getFigure(problem, "C");
-		for (String figureKey : problem.getFigures().keySet()) {
-			if (figureKey.matches("[0-9]+"))
-				candidates.put(
-						new int[] { Integer.parseInt(figureKey), 0, 0, 0},
-						new FigureQuad(Utils.getFigure(problem, "A"), Utils
-								.getFigure(problem, "B"), Utils.getFigure(
-								problem, "C"), Utils.getFigure(problem,
-								figureKey)));
+		for (int i = 1; i <= 6; i++) {
+			candidates.put(
+					new int[] { i, 0, 0, 0 },
+					new FigureQuad(
+							Utils.getFigure(problem, "A"), 
+							Utils.getFigure(problem, "B"), 
+							Utils.getFigure(problem,"C"), 
+							Utils.getFigure(problem, "" + i), 
+							language));
 		}
 		return candidates;
 	}

@@ -1,6 +1,8 @@
 package project2;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -15,18 +17,26 @@ public class MappedFigurePair extends FigurePair {
 	private int perm;
 	private int[] mapping;
 
-	public MappedFigurePair(RavensFigure left, RavensFigure right) {
+	public MappedFigurePair(RavensFigure left, RavensFigure right, HashMap<String, HashSet<String>> language) {
 		super(left, right);
 		this.numObjects = Math.max(left.getObjects().size(), right.getObjects()
 				.size());
 		this.indexLeft = new String[numObjects];
 		this.indexRight = new String[numObjects];
+		/* assure order and label invariant mappings are produced */
+		RavensObjectComparator comparator = new RavensObjectComparator(language);
+		ArrayList<RavensObject> leftObjects = new ArrayList<RavensObject>();
+		leftObjects.addAll(getLeft().getObjects());
+		Collections.sort(leftObjects,comparator);
+		ArrayList<RavensObject> rightObjects = new ArrayList<RavensObject>();
+		rightObjects.addAll(getRight().getObjects());
+		Collections.sort(rightObjects,comparator);
 		/* index object names */
-		for (int i = 0; i < getLeft().getObjects().size(); i++)
-			indexLeft[i] = getLeft().getObjects().get(i).getName();
-		for (int i = 0; i < getRight().getObjects().size(); i++)
-			indexRight[i] = getRight().getObjects().get(i).getName();
-		/* default mapping */
+		for (int i = 0; i < leftObjects.size(); i++)
+			indexLeft[i] = leftObjects.get(i).getName();
+		for (int i = 0; i < rightObjects.size(); i++)
+			indexRight[i] = rightObjects.get(i).getName();
+		/* set default mapping */
 		perms = JohnsonTrotter.perm(numObjects);
 		setPerm(0);
 	}
