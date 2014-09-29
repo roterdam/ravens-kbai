@@ -27,7 +27,7 @@ public class MappedFigurePair extends FigurePair {
 		for (int i = 0; i < getRight().getObjects().size(); i++)
 			indexRight[i] = getRight().getObjects().get(i).getName();
 		/* default mapping */
-		perms=JohnsonTrotter.perm(numObjects);
+		perms = JohnsonTrotter.perm(numObjects);
 		setPerm(0);
 	}
 
@@ -129,6 +129,10 @@ public class MappedFigurePair extends FigurePair {
 		return perm;
 	}
 
+	public int getNumPerms() {
+		return perms.size();
+	}
+
 	public int permute() {
 		this.perm++;
 		if (this.perm >= perms.size())
@@ -136,5 +140,4 @@ public class MappedFigurePair extends FigurePair {
 		this.mapping = perms.get(this.perm);
 		return this.perm;
 	}
-
 }
