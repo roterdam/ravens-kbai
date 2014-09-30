@@ -394,18 +394,23 @@ public class Utils {
 											if (a[2].contains("angle")) {
 												// compare numeric value,
 												// probably an angle
-												if (Math.abs(Integer
-														.parseInt(a[3])
-														- Integer
-																.parseInt(a[4])) == Math
-														.abs(Integer
-																.parseInt(b[3])
-																- Integer
-																		.parseInt(b[4]))) {
-													score += 2;
-												} else {
-													// At least it's the same
-													// changed attr
+												try {
+													if (Math.abs(Integer
+															.parseInt(a[3])
+															- Integer
+																	.parseInt(a[4])) == Math
+															.abs(Integer
+																	.parseInt(b[3])
+																	- Integer
+																			.parseInt(b[4]))) {
+														score += 2;
+													} else {
+														// At least it's the
+														// same
+														// changed attr
+														score++;
+													}
+												} catch (NumberFormatException e) {
 													score++;
 												}
 											} else {

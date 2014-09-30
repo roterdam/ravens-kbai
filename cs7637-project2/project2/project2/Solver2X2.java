@@ -25,9 +25,12 @@ public class Solver2X2 extends RavensSolver {
 	private HashMap<String, HashSet<String>> language;
 	private double bestDiag;
 	private FigureQuadEvaluationFunction eval;
+	private Storage storage;
+	private RavensProblemCase casefile;
 
-	public Solver2X2(RavensProblem problem, Random random, Logger log) {
-		this.problem = problem;
+	public Solver2X2(RavensProblemCase casefile, Random random, Logger log) {
+		this.casefile=casefile;
+		this.problem = casefile.getProblem();
 		this.random = random;
 		this.log = log;
 		this.solution = "1";
@@ -141,8 +144,9 @@ public class Solver2X2 extends RavensSolver {
 					i, value, b));
 		}
 		log.info(String.format(
-				"Optimal answer %s permutation's diagonal: %.2f", quad.label,
+				"Answer %s's best permutation's diagonal: %.2f", quad.label,
 				bestVal));
+		casefile.mapFigures(quad,bestSeen);
 		return bestSeen.get(peak);
 	}
 

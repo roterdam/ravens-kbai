@@ -72,21 +72,23 @@ public class Agent {
 	 * @return your Agent's answer to this problem
 	 */
 	public String Solve(RavensProblem problem) {
+		RavensProblemCase casefile = new RavensProblemCase(problem);
 		/* redirect debug output to file */
 		PrintStream o = System.out;
 			PrintStream f = new PrintStream(dfile);
 			System.setOut(f);
-		String response = productionSystem.solve(problem);
+		String response = productionSystem.solve(casefile);
 		String answer = problem.checkAnswer(response);
 		boolean correct = response.equals(answer);
 		/* Keep statistics */
 		problems++;
 		if (correct)
 			right++;
+		/* Output the result */
 		log.info(String.format("%s - Response: %s, Answer: %s, Accuracy: %.02f",
 				problem.getName(), response, answer, right / problems));
-		/* Pass the result back up the chain */
-		productionSystem.provideFeedbackOnProblem(problem,answer);
+		/* Record the result */
+		casefile.setAnswer(answer);
 		/* return output to stdout */
 		System.setOut(o);
 		return response;
