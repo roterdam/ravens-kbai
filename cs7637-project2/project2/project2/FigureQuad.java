@@ -75,6 +75,15 @@ public class FigureQuad {
 		return new Instance(findSimplestPermutation());
 	}
 	
+	public int scoreMappingChangeSet() {
+		int score=0;
+		score+=scoreChangeSet(top.getChangeSet());
+		score+=scoreChangeSet(left.getChangeSet());
+		score+=scoreChangeSet(bottom.getChangeSet());
+		score+=scoreChangeSet(right.getChangeSet());
+		return score;
+	}
+	
 	private int scoreChangeSet(ArrayList<String[]> changeSet) {
 		int score = 0;
 		for (String[] change : changeSet) {

@@ -26,6 +26,7 @@ public class Solver2X2 extends RavensSolver {
 	private double bestDiag;
 	private Storage storage;
 	private RavensProblemCase casefile;
+	private int bestDiff;
 
 	public Solver2X2(RavensProblemCase casefile, Random random, Logger log) {
 		this.casefile = casefile;
@@ -34,6 +35,7 @@ public class Solver2X2 extends RavensSolver {
 		this.log = log;
 		this.solution = "1";
 		this.bestDiag = -1;
+		this.bestDiff = Integer.MAX_VALUE;
 		this.language = Utils.learnLanguage(problem);
 	}
 
@@ -52,30 +54,34 @@ public class Solver2X2 extends RavensSolver {
 			FigureQuad quad = candidates.get(key);
 
 			/* start up a new evaluation function for this quad */
-			FigureQuadEvaluationFunction eval = new FigureQuadEvaluationFunction(quad);
-			
+			FigureQuadEvaluationFunction eval = new FigureQuadEvaluationFunction(
+					quad);
+
 			/* permutation search */
 			Instance perm = geneticSearchForBetterMapping(quad, eval);
 
 			quad.setPermutations(perm);
-			double score = eval.value(perm);
+			int diff = quad.scoreMappingChangeSet();
+			double diag = eval.value(perm);
 
-			log.info(String
-					.format("%s - Option: %s, diag: %.2f",
-							problem.getName(), quad.label, score));
+			log.info(String.format("%s - Option: %s, diag: %.2f, diff: %d",
+					problem.getName(), quad.label, diag, diff));
 
-			if (score > this.bestDiag) {
-				this.bestDiag = score;
+			if (diag > this.bestDiag && diff < this.bestDiff) {
+				this.bestDiag = diag;
+				this.bestDiff = diff;
 				this.solution = quad.label;
 			}
+
 		}
 	}
 
-	private Instance geneticSearchForBetterMapping(FigureQuad quad, FigureQuadEvaluationFunction eval) {
-		/* 
-		 * We are searching over the "weights" which are actualy indexes to 
-		 * precalculated permutations of object mappings each mapped figure 
-		 * pair in the figure quad.
+	private Instance geneticSearchForBetterMapping(FigureQuad quad,
+			FigureQuadEvaluationFunction eval) {
+		/*
+		 * We are searching over the "weights" which are actualy indexes to
+		 * precalculated permutations of object mappings each mapped figure pair
+		 * in the figure quad.
 		 */
 		double[] perm = new double[4];
 		Instance d = new Instance(perm);
@@ -129,8 +135,11 @@ public class Solver2X2 extends RavensSolver {
 						(System.currentTimeMillis() - start) / 1000.0));
 		int peak = 0;
 		double[] val = new double[bestSeen.size()];
+		int[] diff = new int[bestSeen.size()];
 		for (int i = 0; i < val.length; i++) {
 			Instance b = bestSeen.get(i);
+			quad.setPermutations(b);
+			diff[i] = quad.scoreMappingChangeSet();
 			val[i] = eval.value(b);
 			if (val[i] > val[peak]) {
 				peak = i;
@@ -141,8 +150,23 @@ public class Solver2X2 extends RavensSolver {
 		}
 		log.info(String.format("Answer %s's best permutation's diagonal: %.2f",
 				quad.label, val[peak]));
+		/* Now look for ties and prefer the simplest changeset */
+		int remaining = 0;
+		int best = peak;
+		for (int i = 0; i < val.length; i++) {
+			if (val[i] >= val[peak]) {
+				remaining++;
+				if (diff[i] <= diff[best])
+					best = i;
+			}
+		}
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < val.length; i++)
+			if (val[i] >= val[peak] && diff[i] <= diff[best])
+				buf.append(String.format(" %s:(%.2f/%d)", i, val[i], diff[i]));
+		log.info("Reduced to %d candidate mappings [" + buf.toString() + " ]");
 		casefile.mapFigures(quad, bestSeen);
-		return bestSeen.get(peak);
+		return bestSeen.get(best);
 	}
 
 	public HashMap<int[], FigureQuad> generateCandidates() {
