@@ -23,6 +23,7 @@ public class RavensProblemCase {
 	public RavensProblemCase(RavensProblem problem) {
 		this.problem = problem;
 		this.uid = UUID.randomUUID();
+		this.figureMappings = new HashMap<FigureQuad, ArrayList<Instance>>();
 	}
 
 	public void setResponse(String response) {
@@ -78,7 +79,7 @@ public class RavensProblemCase {
 	}
 
 	private String field(String key, String value) {
-		return String.format("%s:%s\n", key, value);
+		return String.format("%s:%s\r\n", key, value);
 	}
 
 }
