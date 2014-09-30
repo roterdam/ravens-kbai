@@ -84,7 +84,7 @@ public class Solver2X2 extends RavensSolver {
 				eval, random);
 		/* Lots of mating and mutating, prioritize exploration */
 		StandardGeneticAlgorithm trainer = new StandardGeneticAlgorithm(100,
-				30, 60, gap);
+				60, 40, gap);
 		double fitness;
 		/*
 		 * Always include one of the simplest starting configurations (it used

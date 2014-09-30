@@ -26,7 +26,7 @@ public class Trainer {
 		String response;
 		try {
 			PrintWriter out = new PrintWriter("lint.txt");
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 20; i++) {
 				for (RavensProblem problem : all) {
 					response = agent.Solve(problem);
 					out.printf("%s,%s,%s\n", problem.getName(), response,
