@@ -45,9 +45,9 @@ public class Storage {
 	}
 
 	public void save(RavensProblemCase casefile) throws IOException {
-		File storage = new File("storage/"+casefile.getProblem().getName()+".txt");
+		File storage = new File("storage/"+casefile.getProblem().getName());
 		storage.mkdirs();
-		File f = new File(storage,casefile.getUID());
+		File f = new File(storage,casefile.getUID()+".txt");
 		casefile.write(f);
 	}
 }

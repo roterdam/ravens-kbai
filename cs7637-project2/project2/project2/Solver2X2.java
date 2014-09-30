@@ -92,20 +92,27 @@ public class Solver2X2 extends RavensSolver {
 		eval = new FigureQuadEvaluationFunction(quad, language);
 		GeneticAlgorithmProblem gap = new FigureQuadPermutationProblem(quad,
 				eval, random);
+		/* Lots of mating and mutating, prioritize exploration */
 		StandardGeneticAlgorithm trainer = new StandardGeneticAlgorithm(100,
-				10, 50, gap);
+				60, 30, gap);
 		double fitness;
-		long start = System.currentTimeMillis();
-		long tick = start + 1000;
-		long timeout = start+60000-1;
+		/* 
+		 * Always include one of the simplest starting configurations
+		 * (it used to be the only configuration considered)
+		 */
+		ArrayList<Instance> bestSeen = new ArrayList<Instance>();
+		bestSeen.add(quad.findSimplestPermutationInstance());
+		/* spend a little time in random search */
 		log.info(String.format(
 				"Searching the permutation space for answer %s (%d)",
 				quad.label, quad.sizeOfPermutationSpace()));
-		ArrayList<Instance> bestSeen = new ArrayList<Instance>();
-		bestSeen.add(quad.findSimplestPermutationInstance());
 		double bestValue = eval.value(bestSeen.get(0));
-		long generations = Math.max(100L,
-				100L * (long) Math.log10(quad.sizeOfPermutationSpace()));
+		/* also limit GA iterations */
+		long generations = Math.min(100L, quad.sizeOfPermutationSpace()/200L);
+		/* Keep time */
+		long start = System.currentTimeMillis();
+		long tick = start + 1000;
+		long timeout = start+9999; // 10 seconds per answer candidate
 		for (int i = 0; i < generations; i++) {
 			fitness = trainer.train();
 			/* check for improvement every generation */
@@ -117,8 +124,8 @@ public class Solver2X2 extends RavensSolver {
 			}
 			if (System.currentTimeMillis() >= tick) {
 				log.info(String
-						.format("Permuting answer %s, generation %d/%d, improvements: %d",
-								quad.label, i, generations, bestSeen.size()));
+						.format("Permuting answer %s, generation %d, improvements: %d",
+								quad.label, i, bestSeen.size()));
 				if(tick>=timeout) {
 					log.info("Time expired, stopping search.");
 					break;
@@ -131,21 +138,20 @@ public class Solver2X2 extends RavensSolver {
 						quad.label, bestSeen.size()-1,
 						(System.currentTimeMillis() - start) / 1000.0));
 		int peak = 0;
-		double bestVal = -1;
-		for (int i = 0; i < bestSeen.size(); i++) {
+		double [] val = new double[bestSeen.size()];
+		for (int i = 0; i < val.length; i++) {
 			Instance b = bestSeen.get(i);
-			double value = -eval.value(b);
-			if (value > bestVal) {
-				bestVal = value;
+			val[i] = -eval.value(b);
+			if (val[i] > val[peak]) {
 				peak = i;
 			}
 			log.info(String.format(
 					"Answer %s, improvement %d, fitness %.2f, %s", quad.label,
-					i, value, b));
+					i, val[i], b));
 		}
 		log.info(String.format(
 				"Answer %s's best permutation's diagonal: %.2f", quad.label,
-				bestVal));
+				val[peak]));
 		casefile.mapFigures(quad,bestSeen);
 		return bestSeen.get(peak);
 	}
