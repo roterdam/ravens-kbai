@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import project1.RavensSolver;
 
-
 public class MyProductionSystem {
 
 	private Logger log;
@@ -23,20 +22,24 @@ public class MyProductionSystem {
 	public String solve(RavensProblem problem) {
 		/* initial tableau */
 		RavensSolver solver = null;
-		String problemType=problem.getProblemType();
+		String problemType = problem.getProblemType();
 		/* logic */
 		if (problemType.equals("2x1")) {
 			solver = new project2.Solver2X2(problem, random, log);
 		}
 		if (problemType.equals("2x2")) {
+			/*
+			 * todo: clone problem replacing symmetric rotations with flips to
+			 * handle 2x2 basic 4
+			 */
 			solver = new project2.Solver2X2(problem, random, log);
 		}
-		if (solver==null) {
-			throw new RuntimeException("Why is this happening? ("+problemType+")");
-			//solver = new project1.RandomSolver(problem, random);
+		if (solver == null) {
+			/* default case */
+			solver = new project1.RandomSolver(problem, random);
 		}
 		// Random override
-		//solver = new project1.RandomSolver(problem, random);
+		// solver = new project1.RandomSolver(problem, random);
 		/* execute plan */
 		solver.solve();
 		String response = solver.getSolution();
