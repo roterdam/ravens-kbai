@@ -154,20 +154,21 @@ public class Solver2X2 extends RavensSolver {
 		log.info(String.format("Answer %s's best permutation's diagonal: %.2f",
 				quad.label, val[peak]));
 		/* Now look for ties and prefer the simplest changeset */
-		int remaining = 0;
 		int best = peak;
 		for (int i = 0; i < val.length; i++) {
 			if (val[i] >= val[peak]) {
-				remaining++;
 				if (diff[i] <= diff[best])
 					best = i;
 			}
 		}
 		StringBuffer buf = new StringBuffer();
+		int remaining = 0;
 		for (int i = 0; i < val.length; i++)
-			if (val[i] >= val[peak] && diff[i] <= diff[best])
+			if (val[i] >= val[peak] && diff[i] <= diff[best]) {
 				buf.append(String.format(" %s:(%.2f/%d)", i, val[i], diff[i]));
-		log.info("Reduced to %d candidate mappings [" + buf.toString() + " ]");
+				remaining++;
+			}
+		log.info(String.format("Reduced to %d candidate mappings [%s ]",remaining,buf.toString()));
 		casefile.mapFigures(quad, bestSeen);
 		return bestSeen.get(best);
 	}
