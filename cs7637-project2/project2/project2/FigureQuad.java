@@ -15,6 +15,8 @@ public class FigureQuad {
 	public String label;
 	private long permSize;
 	private HashMap<String, HashSet<String>> language;
+	private Instance perm;
+	private HashMap<Instance, Double> permValue;
 
 	public FigureQuad(RavensFigure a, RavensFigure b,
 			RavensFigure c, RavensFigure d, HashMap<String, HashSet<String>> language) {
@@ -28,13 +30,11 @@ public class FigureQuad {
 		this.permSize*=left.getNumPerms();
 		this.permSize*=bottom.getNumPerms();
 		this.permSize*=right.getNumPerms();
+		this.permValue=new HashMap<Instance,Double>();
 	}
-
+	
 	public void setPermutations(double[] perm) {
-		this.top.setPerm((int) perm[0]);
-		this.left.setPerm((int) perm[1]);
-		this.bottom.setPerm((int) perm[2]);
-		this.right.setPerm((int) perm[3]);
+		this.setPermutations(new Instance(perm));
 	}
 
 	public void setPermutations(Instance d) {
@@ -42,6 +42,7 @@ public class FigureQuad {
 		this.left.setPerm((int) d.getContinuous(1));
 		this.bottom.setPerm((int) d.getContinuous(2));
 		this.right.setPerm((int) d.getContinuous(3));
+		this.perm=d;
 	}
 	
 	public long sizeOfPermutationSpace() {
@@ -98,4 +99,12 @@ public class FigureQuad {
 	private final String[] CHANGES = { "flip", "angle", "size", "deleted",
 			"shape", "other" };
 	private final int[] SCORES = { 1, 3, 2, 4, 9, 1 };
+
+	public void setValue(double d) {
+		permValue.put(perm, Double.valueOf(d));
+	}
+	
+	public Double retrieveValue() {
+		return permValue.get(perm);
+	}
 }

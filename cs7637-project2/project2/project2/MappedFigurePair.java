@@ -150,4 +150,12 @@ public class MappedFigurePair extends FigurePair {
 		this.mapping = perms.get(this.perm);
 		return this.perm;
 	}
+
+	public String printMapping() {
+		StringBuffer buf = new StringBuffer();
+		for(int i=0;i<mapping.length;i++) {
+			buf.append("@"+i+"//"+indexLeft[i]+"->"+indexRight[mapping[i]]);
+		}
+		return buf.toString();
+	}
 }

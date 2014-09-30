@@ -70,6 +70,18 @@ public class RavensProblemCase {
 			out.write(field("solver-class", solver));
 			out.write(field("solver-answer", response));
 			out.write(field("solver-correct", response.equals(answer)?"yes":"no"));
+			for(FigureQuad quad:figureMappings.keySet()) {
+				ArrayList<Instance> bestMappings = figureMappings.get(quad);
+				for (Instance d: bestMappings) {
+					quad.setPermutations(d);
+					out.write(field("figure-quad-label",quad.label));
+					out.write(field("figure-quad-mapping-top",quad.top.printMapping()));
+					out.write(field("figure-quad-mapping-left",quad.left.printMapping()));
+					out.write(field("figure-quad-mapping-bottom",quad.bottom.printMapping()));
+					out.write(field("figure-quad-mapping-right",quad.right.printMapping()));
+					out.write(field("figure-quad-mapping-value",quad.retrieveValue().toString()));
+				}
+			}
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("This should never happen");
 		} finally {

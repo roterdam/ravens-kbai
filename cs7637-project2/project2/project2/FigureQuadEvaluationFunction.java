@@ -38,6 +38,7 @@ public class FigureQuadEvaluationFunction implements EvaluationFunction {
 		score[1] = Utils.compareChangeSets(leftChangeSet,
 				rightChangeSet);
 		score[2] = Math.sqrt(Math.pow(score[0], 2)+Math.pow(score[1], 2));
+		quad.setValue(score[2]);
 		return -score[2];
 	}
 
