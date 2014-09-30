@@ -69,7 +69,7 @@ public class RavensProblemCase {
 			out.write(field("problem-type", problem.getProblemType()));
 			out.write(field("solver-class", solver));
 			out.write(field("solver-answer", response));
-			out.write(field("solver-correct", response.equals(answer)?"yes":"no"));
+			out.write(field("solver-correct", response.equals(problem.checkAnswer(response))?"yes":"no"));
 			for(FigureQuad quad:figureMappings.keySet()) {
 				ArrayList<Instance> bestMappings = figureMappings.get(quad);
 				for (Instance d: bestMappings) {
@@ -80,6 +80,10 @@ public class RavensProblemCase {
 					out.write(field("figure-quad-mapping-bottom",quad.bottom.printMapping()));
 					out.write(field("figure-quad-mapping-right",quad.right.printMapping()));
 					out.write(field("figure-quad-mapping-value",quad.retrieveValue().toString()));
+					out.write(field("figure-quad-changes-top",quad.top.printChangeSet()));
+					out.write(field("figure-quad-changes-left",quad.left.printChangeSet()));
+					out.write(field("figure-quad-changes-bottom",quad.bottom.printChangeSet()));
+					out.write(field("figure-quad-changes-right",quad.right.printChangeSet()));
 				}
 			}
 		} catch (FileNotFoundException e) {

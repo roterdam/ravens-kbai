@@ -16,9 +16,11 @@ public class MappedFigurePair extends FigurePair {
 	private ArrayList<int[]> perms;
 	private int perm;
 	private int[] mapping;
+	private HashMap<String, HashSet<String>> language;
 
 	public MappedFigurePair(RavensFigure left, RavensFigure right, HashMap<String, HashSet<String>> language) {
 		super(left, right);
+		this.language=language;
 		this.numObjects = Math.max(left.getObjects().size(), right.getObjects()
 				.size());
 		this.indexLeft = new String[numObjects];
@@ -41,8 +43,7 @@ public class MappedFigurePair extends FigurePair {
 		setPerm(0);
 	}
 
-	public ArrayList<String[]> getChangeSet(
-			HashMap<String, HashSet<String>> language) {
+	public ArrayList<String[]> getChangeSet() {
 		ArrayList<String[]> changeSet = new ArrayList<String[]>();
 		for (int i = 0; i < mapping.length; i++) {
 			RavensObject l = null, r = null;
@@ -153,9 +154,25 @@ public class MappedFigurePair extends FigurePair {
 
 	public String printMapping() {
 		StringBuffer buf = new StringBuffer();
+		buf.append("[");
 		for(int i=0;i<mapping.length;i++) {
-			buf.append("@"+i+"//"+indexLeft[i]+"->"+indexRight[mapping[i]]);
+			buf.append(" "+i+":"+indexLeft[i]+"->"+indexRight[mapping[i]]);
 		}
+		buf.append(" ]");
+		return buf.toString();
+	}
+	
+	public String printChangeSet() {
+		ArrayList<String[]> c = getChangeSet();
+		StringBuffer buf = new StringBuffer();
+		buf.append("[");
+		for(int i=0;i<c.size();i++) {
+			String[] p = c.get(i);
+			buf.append(" "+i+":[ ");
+			for (int j=0;j<p.length;j++) buf.append(" "+p[j]);
+			buf.append(" ]");
+		}
+		buf.append(" ]");
 		return buf.toString();
 	}
 }

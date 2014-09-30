@@ -60,7 +60,7 @@ public class FigureQuad {
 		int min = 0;
 		for (int i = 0; i < differenceScore.length; i++) {
 			mfps[p].setPerm(i);
-			differenceScore[i] = scoreChangeSet(mfps[p].getChangeSet(language));
+			differenceScore[i] = scoreChangeSet(mfps[p].getChangeSet());
 			if (differenceScore[i] < minVal) {
 				minVal = differenceScore[i];
 				min = i;

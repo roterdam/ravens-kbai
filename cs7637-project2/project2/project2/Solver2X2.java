@@ -24,12 +24,11 @@ public class Solver2X2 extends RavensSolver {
 	private Logger log;
 	private HashMap<String, HashSet<String>> language;
 	private double bestDiag;
-	private FigureQuadEvaluationFunction eval;
 	private Storage storage;
 	private RavensProblemCase casefile;
 
 	public Solver2X2(RavensProblemCase casefile, Random random, Logger log) {
-		this.casefile=casefile;
+		this.casefile = casefile;
 		this.problem = casefile.getProblem();
 		this.random = random;
 		this.log = log;
@@ -52,53 +51,44 @@ public class Solver2X2 extends RavensSolver {
 			/* Guess the transformations */
 			FigureQuad quad = candidates.get(key);
 
+			/* start up a new evaluation function for this quad */
+			FigureQuadEvaluationFunction eval = new FigureQuadEvaluationFunction(quad);
+			
 			/* permutation search */
-			Instance perm = searchForGoodPermutationOf(quad);
+			Instance perm = geneticSearchForBetterMapping(quad, eval);
 
-			double[] score = scoreQuadPermutation(quad, perm);
+			quad.setPermutations(perm);
+			double score = eval.value(perm);
 
 			log.info(String
-					.format("%s - Option: %s, LTR: %.0f, TTB: %.0f, diag: %.2f",
-							problem.getName(), quad.label, score[0], score[1],
-							score[2]));
+					.format("%s - Option: %s, diag: %.2f",
+							problem.getName(), quad.label, score));
 
-			key[1] = (int) score[0];
-			key[2] = (int) score[1];
-			if (score[2] > this.bestDiag) {
-				this.bestDiag = score[2];
+			if (score > this.bestDiag) {
+				this.bestDiag = score;
 				this.solution = quad.label;
 			}
 		}
 	}
 
-	private double[] scoreQuadPermutation(FigureQuad quad, Instance perm) {
-		quad.setPermutations(perm);
-		ArrayList<String[]> topChangeSet = quad.top.getChangeSet(language);
-		ArrayList<String[]> leftChangeSet = quad.left.getChangeSet(language);
-		ArrayList<String[]> bottomChangeSet = quad.bottom
-				.getChangeSet(language);
-		ArrayList<String[]> rightChangeSet = quad.right.getChangeSet(language);
-
-		double[] score = new double[3];
-		score[0] = Utils.compareChangeSets(topChangeSet, bottomChangeSet);
-		score[1] = Utils.compareChangeSets(leftChangeSet, rightChangeSet);
-		score[2] = Math.sqrt(Math.pow(score[0], 2) + Math.pow(score[1], 2));
-		return score;
-	}
-
-	private Instance searchForGoodPermutationOf(FigureQuad quad) {
+	private Instance geneticSearchForBetterMapping(FigureQuad quad, FigureQuadEvaluationFunction eval) {
+		/* 
+		 * We are searching over the "weights" which are actualy indexes to 
+		 * precalculated permutations of object mappings each mapped figure 
+		 * pair in the figure quad.
+		 */
 		double[] perm = new double[4];
 		Instance d = new Instance(perm);
-		eval = new FigureQuadEvaluationFunction(quad, language);
+		/* initialize the problem model for ABAGAIL */
 		GeneticAlgorithmProblem gap = new FigureQuadPermutationProblem(quad,
 				eval, random);
 		/* Lots of mating and mutating, prioritize exploration */
 		StandardGeneticAlgorithm trainer = new StandardGeneticAlgorithm(100,
-				60, 30, gap);
+				30, 60, gap);
 		double fitness;
-		/* 
-		 * Always include one of the simplest starting configurations
-		 * (it used to be the only configuration considered)
+		/*
+		 * Always include one of the simplest starting configurations (it used
+		 * to be the only configuration considered)
 		 */
 		ArrayList<Instance> bestSeen = new ArrayList<Instance>();
 		bestSeen.add(quad.findSimplestPermutationInstance());
@@ -108,25 +98,25 @@ public class Solver2X2 extends RavensSolver {
 				quad.label, quad.sizeOfPermutationSpace()));
 		double bestValue = eval.value(bestSeen.get(0));
 		/* also limit GA iterations */
-		long generations = Math.min(100L, quad.sizeOfPermutationSpace()/200L);
+		long generations = Math.min(100L, quad.sizeOfPermutationSpace() / 200L);
 		/* Keep time */
 		long start = System.currentTimeMillis();
 		long tick = start + 1000;
-		long timeout = start+9999; // 10 seconds per answer candidate
+		long timeout = start + 9999; // 10 seconds per answer candidate
 		for (int i = 0; i < generations; i++) {
 			fitness = trainer.train();
 			/* check for improvement every generation */
 			Instance b = trainer.getOptimal();
-			double value = -eval.value(b);
+			double value = eval.value(b);
 			if (value > bestValue) {
 				bestSeen.add(b);
 				bestValue = value;
 			}
 			if (System.currentTimeMillis() >= tick) {
-				log.info(String
-						.format("Permuting answer %s, generation %d, improvements: %d",
-								quad.label, i, bestSeen.size()));
-				if(tick>=timeout) {
+				log.info(String.format(
+						"Permuting answer %s, generation %d, improvements: %d",
+						quad.label, i, bestSeen.size()));
+				if (tick >= timeout) {
 					log.info("Time expired, stopping search.");
 					break;
 				}
@@ -135,13 +125,13 @@ public class Solver2X2 extends RavensSolver {
 		}
 		log.info(String
 				.format("Answer %s permutation path found %d improvements in %.2f seconds",
-						quad.label, bestSeen.size()-1,
+						quad.label, bestSeen.size() - 1,
 						(System.currentTimeMillis() - start) / 1000.0));
 		int peak = 0;
-		double [] val = new double[bestSeen.size()];
+		double[] val = new double[bestSeen.size()];
 		for (int i = 0; i < val.length; i++) {
 			Instance b = bestSeen.get(i);
-			val[i] = -eval.value(b);
+			val[i] = eval.value(b);
 			if (val[i] > val[peak]) {
 				peak = i;
 			}
@@ -149,10 +139,9 @@ public class Solver2X2 extends RavensSolver {
 					"Answer %s, improvement %d, fitness %.2f, %s", quad.label,
 					i, val[i], b));
 		}
-		log.info(String.format(
-				"Answer %s's best permutation's diagonal: %.2f", quad.label,
-				val[peak]));
-		casefile.mapFigures(quad,bestSeen);
+		log.info(String.format("Answer %s's best permutation's diagonal: %.2f",
+				quad.label, val[peak]));
+		casefile.mapFigures(quad, bestSeen);
 		return bestSeen.get(peak);
 	}
 

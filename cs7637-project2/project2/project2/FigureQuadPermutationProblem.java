@@ -21,6 +21,7 @@ public class FigureQuadPermutationProblem implements opt.ga.GeneticAlgorithmProb
 
 	@Override
 	public double value(Instance d) {
+		/* make negative for minimization */
 		return eval.value(d);
 	}
 

@@ -13,8 +13,7 @@ public class FigureQuadEvaluationFunction implements EvaluationFunction {
 	private HashMap<String, HashSet<String>> language;
 	private FigureQuad quad;
 
-	public FigureQuadEvaluationFunction(FigureQuad quad,
-			HashMap<String, HashSet<String>> language) {
+	public FigureQuadEvaluationFunction(FigureQuad quad) {
 		this.quad=quad;
 		this.language=language;
 	}
@@ -23,14 +22,19 @@ public class FigureQuadEvaluationFunction implements EvaluationFunction {
 	@Override
 	public double value(Instance d) {
 		quad.setPermutations(d);
+		
+		/* short circuit in case of repeats */
+		Double saved = quad.retrieveValue();
+		if(saved!=null) return saved.doubleValue();
+		
 		ArrayList<String[]> topChangeSet = 
-				quad.top.getChangeSet(language);
+				quad.top.getChangeSet();
 		ArrayList<String[]> leftChangeSet = 
-				quad.left.getChangeSet(language);
+				quad.left.getChangeSet();
 		ArrayList<String[]> bottomChangeSet = 
-				quad.bottom.getChangeSet(language);
+				quad.bottom.getChangeSet();
 		ArrayList<String[]> rightChangeSet = 
-				quad.right.getChangeSet(language);
+				quad.right.getChangeSet();
 
 		double[] score = new double[3];
 		score[0] = Utils.compareChangeSets(topChangeSet,
@@ -39,7 +43,7 @@ public class FigureQuadEvaluationFunction implements EvaluationFunction {
 				rightChangeSet);
 		score[2] = Math.sqrt(Math.pow(score[0], 2)+Math.pow(score[1], 2));
 		quad.setValue(score[2]);
-		return -score[2];
+		return score[2];
 	}
 
 }

@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class Linter {
+public class Trainer {
 
 	public static void main(String[] args) {
 		ArrayList<ProblemSet> sets = new ArrayList<ProblemSet>();
