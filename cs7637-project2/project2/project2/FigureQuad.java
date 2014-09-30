@@ -90,7 +90,7 @@ public class FigureQuad {
 			if (change[1].equals("insert") || change[1].equals("delete"))
 				score += points("deleted");
 			else if (change[2].contains("flip"))
-				;
+				score += points("flip");
 			else
 				score += points(change[2]);
 		}
@@ -107,7 +107,7 @@ public class FigureQuad {
 	
 	private final String[] CHANGES = { "flip", "angle", "size", "deleted",
 			"shape", "other" };
-	private final int[] SCORES = { 1, 3, 2, 4, 9, 1 };
+	private final int[] SCORES = { 1, 3, 2, 4, 5, 1 };
 
 	public void setValue(double d) {
 		permValue.put(perm, Double.valueOf(d));

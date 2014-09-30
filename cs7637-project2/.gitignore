@@ -1,2 +1,5 @@
 resources
 /bin
+/storage
+/lint.txt
+/debug.log

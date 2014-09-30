@@ -67,9 +67,12 @@ public class Solver2X2 extends RavensSolver {
 			log.info(String.format("%s - Option: %s, diag: %.2f, diff: %d",
 					problem.getName(), quad.label, diag, diff));
 
-			if (diag > this.bestDiag && diff < this.bestDiff) {
+			if (diag > this.bestDiag) {
 				this.bestDiag = diag;
+				this.solution = quad.label;
+			} else if (diag>=this.bestDiag && diff < this.bestDiff) {
 				this.bestDiff = diff;
+				this.bestDiag = diag;
 				this.solution = quad.label;
 			}
 
